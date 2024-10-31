@@ -1,10 +1,11 @@
 #!/bin/bash
 # wget -O - https://dados.pbh.gov.br/dataset/alvaras-de-localizacao-e-funcionamento-emitidos |grep '<a class="dropdown-item resource-url-analytics"' | grep csv | sed 's/<a.*href="//g' | sed 's/".*$//g' | sed 's/\s*//g' | xargs wget
 echo "BEGIN;"
-echo "delete from atividade;"
-echo "delete from alvara;"
-echo "delete from carga;"
-echo "delete from regional;"
+echo "CREATE TABLE 'regional' ('regional'	TEXT NOT NULL, PRIMARY KEY('regional'));"
+echo "CREATE TABLE 'carga' ('ano_mes'	TEXT NOT NULL, PRIMARY KEY('ano_mes'));"
+echo "CREATE TABLE 'alvara' ('codigo'	TEXT NOT NULL UNIQUE,'ano_mes'	TEXT NOT NULL,'regional'	TEXT NOT NULL,'area'	NUMERIC NOT NULL CHECK('area' > 0),FOREIGN KEY('ano_mes') REFERENCES 'carga'('ano_mes'),FOREIGN KEY('regional') REFERENCES 'regional'('regional'),PRIMARY KEY('codigo','ano_mes'));"
+echo "CREATE TABLE 'atividade' ('alvara'	TEXT NOT NULL,'atividade'	TEXT NOT NULL,PRIMARY KEY('alvara','atividade'),FOREIGN KEY('alvara') REFERENCES 'alvara'('codigo'));"
+
 echo "INSERT INTO regional values('BARREIRO');"
 echo "INSERT INTO regional values('CENTRO-SUL');"
 
