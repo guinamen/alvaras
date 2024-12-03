@@ -1,25 +1,9 @@
 #!/bin/bash
 # wget -O - https://dados.pbh.gov.br/dataset/alvaras-de-localizacao-e-funcionamento-emitidos |grep '<a class="dropdown-item resource-url-analytics"' | grep csv | sed 's/<a.*href="//g' | sed 's/".*$//g' | sed 's/\s*//g' | xargs wget
 echo "BEGIN;"
-echo "CREATE TABLE 'regional' ('regional'	TEXT NOT NULL, PRIMARY KEY('regional'));"
 echo "CREATE TABLE 'carga' ('ano_mes'	TEXT NOT NULL, PRIMARY KEY('ano_mes'));"
 echo "CREATE TABLE 'alvara' ('codigo'	TEXT NOT NULL UNIQUE,'ano_mes'	TEXT NOT NULL,'regional'	TEXT NOT NULL,'area'	NUMERIC NOT NULL CHECK('area' > 0),FOREIGN KEY('ano_mes') REFERENCES 'carga'('ano_mes'),FOREIGN KEY('regional') REFERENCES 'regional'('regional'),PRIMARY KEY('codigo','ano_mes'));"
 echo "CREATE TABLE 'atividade' ('alvara'	TEXT NOT NULL,'atividade'	TEXT NOT NULL,PRIMARY KEY('alvara','atividade'),FOREIGN KEY('alvara') REFERENCES 'alvara'('codigo'));"
-
-echo "INSERT INTO regional values('BARREIRO');"
-echo "INSERT INTO regional values('CENTRO-SUL');"
-
-echo "INSERT INTO regional values('NORDESTE');"
-
-echo "INSERT INTO regional values('NOROESTE');"
-
-echo "INSERT INTO regional values('NORTE');"
-
-echo "INSERT INTO regional values('OESTE');"
-
-echo "INSERT INTO regional values('PAMPULHA');"
-
-echo "INSERT INTO regional values('VENDA NOVA');"
 
 for filename in ./*.csv; do
 	ANO_MES=$(echo $filename | sed 's/_alvaras_localizacao_funcionamento_emitidos.csv//g' | sed 's/\.\///g')
