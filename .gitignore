@@ -4,3 +4,4 @@ data/load_data/dados.sql
 *.db
 *.swp
 data/frequent_itemsets/frequent_itemsets.txt
+.Rproj.user
