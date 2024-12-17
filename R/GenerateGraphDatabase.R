@@ -1,12 +1,13 @@
 library(DBI)
 library(tidyverse)
+library(hash)
 
 load_data <- function(banco="../data/database.db") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
       mydb,
-      ' select ano_mes, alvara, group_concat(secao) as divisoes from
+      'select ano_mes, alvara, group_concat(distinct secao) as divisoes from
           (select DISTINCT alvara.ano_mes ,atividade.alvara, divisao.secao from atividade
              INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
              INNER join alvara on alvara.codigo = atividade.alvara)
@@ -21,7 +22,7 @@ generate_graph <- function(dados) {
   grafo = data.frame()
   tamanho = dim(dados)[1]
   for (i in 1:tamanho) {
-    atividades = strsplit(dados[[i,'divisoes']], ',', fixed=T)[[1]]
+    atividades = sort(unique(strsplit(dados[[i,'divisoes']], ',', fixed=T)[[1]]))
     carga = dados[[i, 'ano_mes']]
     if(length(atividades) > 1) {
       combinacoes = t(combn(atividades, 2))
@@ -52,10 +53,14 @@ save_graph_file <- function(banco="../dynamic_graph/graph.db", arquivo="../freq_
   dados <-as_tibble(
     dbGetQuery(
       mydb,
-      ' select * from secao'
+      'select * from secao'
     )
   )
   dbDisconnect(mydb)
+  dados$no1 <- factor(dados$no1,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
+  dados$no2 <- factor(dados$no2,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
+  dados$no1 <- as.numeric(dados$no1)
+  dados$no2 <- as.numeric(dados$no2)
   anos = sort(unique(dados %>% pull(ano_mes)))
   vertice_id = 0
   linhas = c()
@@ -69,16 +74,16 @@ save_graph_file <- function(banco="../dynamic_graph/graph.db", arquivo="../freq_
         dados %>%
           filter(ano_mes==anos[i]) %>%
           pull(no2)))
-    vertices_ids = c()
+    vertices_ids <- hash()
     for (vertice in vertices) {
       linhas = append(linhas, paste0("v ", vertice_id, " ",vertice))
-      vertices_ids = c(vertices_ids,vertice_id)
+      vertices_ids[[as.character(vertice)]] <- vertice_id
       vertice_id = vertice_id + 1
     }
     g = dados %>% filter(ano_mes == anos[i])
     for (j in 1:(dim(g)[1])) {
-      a = vertices_ids[ match(c(g[[j,'no1']]),vertices) ]
-      b = vertices_ids[ match(c(g[[j,'no2']]),vertices) ]
+      a = vertices_ids[[as.character(g[[j,'no1']])]]
+      b = vertices_ids[[as.character(g[[j,'no2']])]]
       if (is.na(a) | is.na(b)) {
         print("a")
       }
