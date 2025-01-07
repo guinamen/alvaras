@@ -5,3 +5,6 @@ data/load_data/dados.sql
 *.swp
 data/frequent_itemsets/frequent_itemsets.txt
 .Rproj.user
+data/load_data/carga.sql
+R/.Rhistory
+frequent_itemsets/*.txt
