@@ -33,6 +33,23 @@ load_attributes <- function(banco="../data/database.db") {
     return(dt)
 }
 
+load_attributes_area <- function(banco="../data/database.db") {
+  mydb <- dbConnect(RSQLite::SQLite(), banco)
+  dt <-as_tibble(
+    dbGetQuery(
+      mydb,
+      'select ano_mes, regional, secao, sum(area) as total
+          from atividade
+            INNER join alvara on atividade.alvara = alvara.codigo
+            INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
+        group by ano_mes, regional, secao'
+    )
+  )
+  dbDisconnect(mydb)
+  dt$id = sapply(dt$secao, utf8ToInt)-utf8ToInt('A')
+  return(dt)
+}
+
 is_duplicate <- function(x, seen) {
   pair <- paste(x[1], x[2], sep = ",")
   reverse_pair <- paste(x[2], x[1], sep = ",")
@@ -76,7 +93,7 @@ write_graph <- function(dados) {
   close(fileConn)
 }
 
-write_attributes <- function(dados) {
+write_attributes <- function(dados, file="../dynamic_graph/TSeqMiner/attributes.txt") {
   anos = sort(unique(dados %>% pull(ano_mes)))
   linhas = c()
   for (i in 1:length(anos)) {
@@ -122,7 +139,7 @@ write_attributes <- function(dados) {
         g$PAMPULHA,
         g$'VENDA NOVA', sep = " "))
   }
-  fileConn<-file("../dynamic_graph/TSeqMiner/attributes.txt")
+  fileConn<-file(file)
   writeLines(linhas, fileConn)
   close(fileConn)
 }
@@ -150,4 +167,5 @@ generate_graph <- function(dados) {
 }
 
 write_attributes(load_attributes())
+write_attributes(load_attributes_area(),file = '../dynamic_graph/TSeqMiner/attributes_area.txt')
 write_graph(generate_graph(load_data()) )
