@@ -8,3 +8,4 @@ data/frequent_itemsets/frequent_itemsets.txt
 data/load_data/carga.sql
 R/.Rhistory
 frequent_itemsets/*.txt
+R/.RData
