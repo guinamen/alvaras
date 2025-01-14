@@ -9,3 +9,9 @@ data/load_data/carga.sql
 R/.Rhistory
 frequent_itemsets/*.txt
 R/.RData
+paper/main.aux
+paper/main.bbl
+paper/main.blg
+paper/main.log
+paper/main.out
+paper/main.pdf

@@ -145,19 +145,25 @@ write_attributes <- function(dados, file="../dynamic_graph/TSeqMiner/attributes.
           OESTE=0,
           PAMPULHA=0,
           `VENDA NOVA`=0))
+    g$ANEL1 = g$LESTE + g$NOROESTE + g$OESTE
+    g$ANEL2 = g$BARREIRO + g$PAMPULHA +g$NORDESTE + g$`VENDA NOVA` +g$NORTE
     linhas = append(
       linhas,
       paste(
         g$id,
-        g$BARREIRO,
+        g$ANEL1,
+        g$ANEL2,
         g$'CENTRO-SUL',
-        g$LESTE,
-        g$NORDESTE,
-        g$NOROESTE,
-        g$NORTE,
-        g$OESTE,
-        g$PAMPULHA,
-        g$'VENDA NOVA', sep = " "))
+        #g$BARREIRO,
+        #g$LESTE,
+        #g$NORDESTE,
+        #g$NOROESTE,
+        #g$NORTE,
+        #g$OESTE,
+        #g$PAMPULHA,
+        #g$'VENDA NOVA',
+        
+        sep = " "))
   }
   fileConn<-file(file)
   writeLines(linhas, fileConn)
