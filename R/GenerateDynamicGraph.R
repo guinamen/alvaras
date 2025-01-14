@@ -50,6 +50,26 @@ load_attributes_area <- function(banco="../data/database.db") {
   return(dt)
 }
 
+load_attributes_most_common <- function(banco="../data/database.db") {
+  mydb <- dbConnect(RSQLite::SQLite(), banco)
+  dt <-as_tibble(
+    dbGetQuery(
+      mydb,
+      'select alvara, ano_mes, regional, atividade, secao 
+      from atividade INNER join alvara on atividade.alvara = alvara.codigo
+            INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo'
+    )
+  )
+  dbDisconnect(mydb)
+  dt = dt %>% group_by(alvara, ano_mes, regional, secao) %>%
+          slice(which.max(n())) %>%
+          ungroup() %>%
+          group_by(ano_mes, regional, secao) %>%
+          summarise(total=n(),.groups = 'drop')
+  dt$id = sapply(dt$secao, utf8ToInt)-utf8ToInt('A')
+  return(dt)
+}
+
 is_duplicate <- function(x, seen) {
   pair <- paste(x[1], x[2], sep = ",")
   reverse_pair <- paste(x[2], x[1], sep = ",")
@@ -166,6 +186,6 @@ generate_graph <- function(dados) {
   return(as_tibble(grafo))
 }
 
-write_attributes(load_attributes())
+write_attributes(load_attributes_most_common())
 write_attributes(load_attributes_area(),file = '../dynamic_graph/TSeqMiner/attributes_area.txt')
 write_graph(generate_graph(load_data()) )
