@@ -8,10 +8,14 @@ DATA_BASE = database.db
 DATA_BASE_TABLES = tables/*.sql
 GENERATE_GRAPH = ./scripts/generate_graph.R
 GENERATE_GRAPH_FILE = ./scripts/generate_graph_file.R
+GENERATE_CLUSTER = ./scripts/generate_clusters.R
 GRAPH_FILE = freq_subgraph.txt
 
-freq_subgraph.txt: graph
+freq_subgraph.txt: cluster
 	 $(GENERATE_GRAPH_FILE)
+
+cluster: graph
+	$(GENERATE_CLUSTER)
 
 graph: database
 	$(GENERATE_GRAPH)

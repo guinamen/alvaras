@@ -39,19 +39,13 @@ generate_graph <- function(dados) {
   }
   return(as_tibble(grafo))
 }
-
+(codigo, descricao)
 
 save_graph <- function(dataset, banco="database.db") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dbSendQuery(mydb, 'INSERT INTO grafo (ano_mes, atividade_a, atividade_b, total) VALUES (:ano_mes, :atividade_a, :atividade_b, :total);', dataset)
   dbDisconnect(mydb)
   
-}
-
-find_index_leq <- function(vec, x) {
-  idx <- which(vec <= x)
-  if (length(idx) == 0) return(NA_integer_)  # nenhum valor <= x
-  return(max(idx))
 }
 
 save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt") {
@@ -62,13 +56,6 @@ save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt") {
       'select * from grafo'
     )
   )
-  clusters <-as_tibble(
-    dbGetQuery(
-      mydb,
-      'select min from agrupamento'
-    ) %>% pull(min)
-  )
-
   dbDisconnect(mydb)
   dados$atividade_a <- factor(dados$atividade_a,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
   dados$atividade_b <- factor(dados$atividade_b,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
@@ -100,7 +87,12 @@ save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt") {
       if (is.na(a) | is.na(b)) {
         print("a")
       }
-      n = find_index_leq(clusters,g[[j,'total']])
+      if (g[[j,'total']] < 5)
+        n = 0
+      else if (g[[j,'total']] < 15)
+        n = 1
+      else
+        n = 2
       linhas = append(linhas, paste0("e ", a, " ",b, " ", n))
     }
     linhas = append(linhas, "")

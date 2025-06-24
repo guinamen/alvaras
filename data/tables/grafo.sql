@@ -3,7 +3,7 @@ CREATE TABLE "grafo" (
 	"atividade_a"	TEXT NOT NULL,
 	"atividade_b"	TEXT NOT NULL,
 	"total"	INTEGER NOT NULL,
-	CHECK (total >= 0),
+	CHECK (total > 0),
 	FOREIGN KEY("ano_mes") REFERENCES carga("ano_mes"),
 	FOREIGN KEY("atividade_a") REFERENCES secao("codigo"),
 	FOREIGN KEY("atividade_b") REFERENCES secao("codigo"),
