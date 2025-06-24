@@ -1,11 +1,19 @@
 #!/bin/bash
 # wget -O - https://dados.pbh.gov.br/dataset/alvaras-de-localizacao-e-funcionamento-emitidos |grep '<a class="dropdown-item resource-url-analytics"' | grep csv | sed 's/<a.*href="//g' | sed 's/".*$//g' | sed 's/\s*//g' | xargs wget
+
+if [ -z "$1" ]; then
+    echo "Erro: nenhum parâmetro fornecido."
+    echo "Uso: $0 <parametro>"
+    exit 1
+fi
+
+
 echo "BEGIN;"
 echo "CREATE TABLE 'carga' ('ano_mes'	TEXT NOT NULL, PRIMARY KEY('ano_mes'));"
 echo "CREATE TABLE 'alvara' ('codigo'	TEXT NOT NULL UNIQUE,'ano_mes'	TEXT NOT NULL,'regional'	TEXT NOT NULL,'area'	NUMERIC NOT NULL CHECK('area' > 0),FOREIGN KEY('ano_mes') REFERENCES 'carga'('ano_mes'),FOREIGN KEY('regional') REFERENCES 'regional'('regional'),PRIMARY KEY('codigo','ano_mes'));"
 echo "CREATE TABLE 'atividade' ('alvara'	TEXT NOT NULL,'atividade'	TEXT NOT NULL,PRIMARY KEY('alvara','atividade'),FOREIGN KEY('alvara') REFERENCES 'alvara'('codigo'));"
 
-for filename in ./*.csv; do
+for filename in $1/*.csv; do
 	ANO_MES=$(echo $filename | sed 's/_alvaras_localizacao_funcionamento_emitidos.csv//g' | sed 's/\.\///g')
 	INSERT_CARGA=$(echo "INSERT INTO carga VALUES ('$ANO_MES');")
 	echo $INSERT_CARGA
