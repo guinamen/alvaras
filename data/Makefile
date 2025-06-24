@@ -1,18 +1,21 @@
 # Variáveis
 SQLITE = /usr/bin/sqlite3
 CSV_DIR = csv
-DOWN_LOAD_CSV = ./dowload.sh
-GENERATE_SQL = ./generate_sql.sh
+DOWN_LOAD_CSV = ./scripts/dowload.sh
+GENERATE_SQL = ./scripts/generate_sql.sh
 DATA_SQL = data.sql
 DATA_BASE = database.db
 DATA_BASE_TABLES = tables/*.sql
+GENERATE_GRAPH = ./scripts/generate_graph.R
+GENERATE_GRAPH_FILE = ./scripts/generate_graph_file.R
+GRAPH_FILE = freq_subgraph.txt
 
 freq_subgraph.txt: graph
-	./generate_graph_file.R
+	 $(GENERATE_GRAPH_FILE)
 
 graph: database
-	./generate_graph.R
-
+	$(GENERATE_GRAPH)
+	
 database: data.sql
 	cat $(DATA_BASE_TABLES) | $(SQLITE) $(DATA_BASE)
 	cat $(DATA_SQL) | $(SQLITE) $(DATA_BASE)
@@ -30,3 +33,4 @@ clean:
 	rm -rf $(CSV_DIR)
 	rm -f $(DATA_SQL)
 	rm -f $(DATA_BASE)
+	rm -f $(GRAPH_FILE)
