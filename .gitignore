@@ -17,3 +17,5 @@ paper/main.out
 paper/main.pdf
 data/data.sql
 data/freq_subgraph.txt
+results/freq_subgraph/results.txt
+results/freq_subgraph/log.txt
