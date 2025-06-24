@@ -2,7 +2,7 @@ library(DBI)
 library(tidyverse)
 library(hash)
 
-load_data <- function(banco="../data/database.db") {
+load_data <- function(banco="database.db") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
@@ -41,26 +41,26 @@ generate_graph <- function(dados) {
 }
 
 
-save_graph <- function(dataset, banco="../dynamic_graph/graph.db") {
+save_graph <- function(dataset, banco="database.db") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
-  dbSendQuery(mydb, 'INSERT INTO secao (ano_mes, no1, no2, total) VALUES (:ano_mes, :atividade_a, :atividade_b, :total);', dataset)
+  dbSendQuery(mydb, 'INSERT INTO grafo (ano_mes, atividade_a, atividade_b, total) VALUES (:ano_mes, :atividade_a, :atividade_b, :total);', dataset)
   dbDisconnect(mydb)
   
 }
 
-save_graph_file <- function(banco="../dynamic_graph/graph.db", arquivo="../freq_subgraph/graphs.txt") {
+save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dados <-as_tibble(
     dbGetQuery(
       mydb,
-      'select * from secao'
+      'select * from grafo'
     )
   )
   dbDisconnect(mydb)
-  dados$no1 <- factor(dados$no1,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
-  dados$no2 <- factor(dados$no2,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
-  dados$no1 <- as.numeric(dados$no1)
-  dados$no2 <- as.numeric(dados$no2)
+  dados$atividade_a <- factor(dados$atividade_a,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
+  dados$atividade_b <- factor(dados$atividade_b,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
+  dados$atividade_a <- as.numeric(dados$atividade_a)
+  dados$atividade_b <- as.numeric(dados$atividade_b)
   anos = sort(unique(dados %>% pull(ano_mes)))
   vertice_id = 0
   linhas = c()
@@ -70,10 +70,10 @@ save_graph_file <- function(banco="../dynamic_graph/graph.db", arquivo="../freq_
       c(
         dados %>%
           filter(ano_mes==anos[i]) %>%
-          pull(no1),
+          pull(atividade_a),
         dados %>%
           filter(ano_mes==anos[i]) %>%
-          pull(no2)))
+          pull(atividade_b)))
     vertices_ids <- hash()
     for (vertice in vertices) {
       linhas = append(linhas, paste0("v ", vertice_id, " ",vertice))
@@ -82,8 +82,8 @@ save_graph_file <- function(banco="../dynamic_graph/graph.db", arquivo="../freq_
     }
     g = dados %>% filter(ano_mes == anos[i])
     for (j in 1:(dim(g)[1])) {
-      a = vertices_ids[[as.character(g[[j,'no1']])]]
-      b = vertices_ids[[as.character(g[[j,'no2']])]]
+      a = vertices_ids[[as.character(g[[j,'atividade_a']])]]
+      b = vertices_ids[[as.character(g[[j,'atividade_b']])]]
       if (is.na(a) | is.na(b)) {
         print("a")
       }

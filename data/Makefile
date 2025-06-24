@@ -7,6 +7,11 @@ DATA_SQL = data.sql
 DATA_BASE = database.db
 DATA_BASE_TABLES = tables/*.sql
 
+freq_subgraph.txt: graph
+	./generate_graph_file.R
+
+graph: database
+	./generate_graph.R
 
 database: data.sql
 	cat $(DATA_BASE_TABLES) | $(SQLITE) $(DATA_BASE)
