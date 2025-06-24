@@ -14,7 +14,7 @@ echo "CREATE TABLE 'alvara' ('codigo'	TEXT NOT NULL UNIQUE,'ano_mes'	TEXT NOT NU
 echo "CREATE TABLE 'atividade' ('alvara'	TEXT NOT NULL,'atividade'	TEXT NOT NULL,PRIMARY KEY('alvara','atividade'),FOREIGN KEY('alvara') REFERENCES 'alvara'('codigo'));"
 
 for filename in $1/*.csv; do
-	ANO_MES=$(echo $filename | sed 's/_alvaras_localizacao_funcionamento_emitidos.csv//g' | sed 's/\.\///g')
+	ANO_MES=$(echo $filename | sed 's/_alvaras_localizacao_funcionamento_emitidos.csv//g' | sed 's/^.*20/20/g' |  sed 's/\.\///g')
 	INSERT_CARGA=$(echo "INSERT INTO carga VALUES ('$ANO_MES');")
 	echo $INSERT_CARGA
 	l_number=0
