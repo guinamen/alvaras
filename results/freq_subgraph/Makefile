@@ -3,7 +3,7 @@ LOG_FILE='log.txt'
 NUMBER_OF_GRAPHS := $(shell echo "$$(cat $(GRAPH_FILE) | grep t | tail -1 | sed 's/t # //g') + 1" |bc)
 
 results.txt: support.txt
-	java -jar ~/Downloads/spmf.jar run GSPAN $(GRAPH_FILE) results.txt $$(cat support.txt) 1000 false > @(LOG_FILE)
+	java -jar ~/Downloads/spmf.jar run GSPAN $(GRAPH_FILE) results.txt $$(cat support.txt) 1000 false > $(LOG_FILE)
 
 support.txt: support_number/support_experiment.csv
 	./support_number/elbow.R support_number/support_experiment.csv $(NUMBER_OF_GRAPHS) > support.txt
