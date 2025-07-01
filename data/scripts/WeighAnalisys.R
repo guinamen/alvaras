@@ -2,12 +2,12 @@ library(DBI)
 library(tidyverse)
 library(hash)
 
-load_data <- function(banco="database.db") {
+load_data <- function(banco="database.db", table="grafo_secao") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
       mydb,
-      'select total from grafo'
+      paste('select total from',table)
     )
   )
   dbDisconnect(mydb)
@@ -47,10 +47,10 @@ elboow <- function(totals, max_k=15, nstart=50,iter.max = 15 ) {
   return(totals)
 }
 
-save_clusters <- function(banco="database.db") {
+save_clusters <- function(banco="database.db", table="agrupamento_secao") {
   dataset <- elboow(load_data()) %>% group_by(cluster) %>% summarise(min=min(total), max=max(total)) %>% arrange(min) %>% select(min,max)
   mydb <- dbConnect(RSQLite::SQLite(), banco)
-  dbSendQuery(mydb, 'INSERT INTO agrupamento (min, max) VALUES (:min, :max);', dataset)
+  dbSendQuery(mydb, paste('INSERT INTO',table, '(min, max) VALUES (:min, :max);'), dataset)
   dbDisconnect(mydb)
   
 }

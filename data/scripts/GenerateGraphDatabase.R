@@ -2,17 +2,34 @@ library(DBI)
 library(tidyverse)
 library(hash)
 
-load_data <- function(banco="database.db") {
-  mydb <- dbConnect(RSQLite::SQLite(), banco)
-  dt <-as_tibble(
-    dbGetQuery(
-      mydb,
-      'select ano_mes, alvara, group_concat(distinct secao) as divisoes from
+SECTION_QUERY = 'select ano_mes, alvara, group_concat(distinct secao) as divisoes from
           (select DISTINCT alvara.ano_mes ,atividade.alvara, divisao.secao from atividade
              INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
              INNER join alvara on alvara.codigo = atividade.alvara)
          group by ano_mes, alvara'
-    )
+
+DIVISION_QUERY = 'select ano_mes, alvara, group_concat(distinct codigo) as divisoes from
+          (select DISTINCT alvara.ano_mes ,atividade.alvara, divisao.codigo from atividade
+             INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara)
+         group by ano_mes, alvara'
+
+GROUP_QUERY = 'select ano_mes, alvara, group_concat(distinct codigo) as divisoes from
+          (select DISTINCT alvara.ano_mes ,atividade.alvara, grupo.codigo from atividade
+             INNER JOIN grupo on substr(atividade, 1 ,3) = grupo.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara)
+         group by ano_mes, alvara'
+
+CLASS_QUERY = 'select ano_mes, alvara, group_concat(distinct codigo) as divisoes from
+          (select DISTINCT alvara.ano_mes ,atividade.alvara, classe.codigo from atividade
+             INNER JOIN classe on substr(atividade, 1 ,5) = classe.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara)
+         group by ano_mes, alvara'
+
+load_data <- function(banco="database.db", query=SECTION_QUERY) {
+  mydb <- dbConnect(RSQLite::SQLite(), banco)
+  dt <-as_tibble(
+    dbGetQuery(mydb,query)
   )
   dbDisconnect(mydb)
   return(dt)
@@ -41,9 +58,9 @@ generate_graph <- function(dados) {
 }
 
 
-save_graph <- function(dataset, banco="database.db") {
+save_graph <- function(dataset, banco="database.db", table="grafo_secao") {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
-  dbSendQuery(mydb, 'INSERT INTO grafo (ano_mes, atividade_a, atividade_b, total) VALUES (:ano_mes, :atividade_a, :atividade_b, :total);', dataset)
+  dbSendQuery(mydb, paste('INSERT INTO', table, '(ano_mes, atividade_a, atividade_b, total) VALUES (:ano_mes, :atividade_a, :atividade_b, :total);'), dataset)
   dbDisconnect(mydb)
   
 }
@@ -54,18 +71,18 @@ find_index_leq <- function(vec, x) {
   return(max(idx))
 }
 
-save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt") {
+save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", table_group="agrupamento_secao", table_graph='grafo_secao') {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dados <-as_tibble(
     dbGetQuery(
       mydb,
-      'select * from grafo'
+      paste('select * from',table_graph)
     )
   )
   clusters <-as_tibble(
     dbGetQuery(
       mydb,
-      'select min from agrupamento'
+      paste('select min from', table_group)
     ) %>% pull(min)
   )
 

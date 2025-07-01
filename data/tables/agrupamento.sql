@@ -1,4 +1,4 @@
-CREATE TABLE "agrupamento" (
+CREATE TABLE "agrupamento_secao" (
 	"id"	INTEGER NOT NULL,
 	"min"	INTEGER NOT NULL,
 	"max"	INTEGER NOT NULL,
@@ -6,3 +6,4 @@ CREATE TABLE "agrupamento" (
 	CHECK(max > 0),
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+
