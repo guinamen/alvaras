@@ -2,13 +2,28 @@ library(DBI)
 library(tidyverse)
 library(igraph)
 
-division = 'SELECT
+SECTION_QUERY = 'SELECT
         ano_mes,
         unicode(atividade_a)-63 as no1,
         unicode(atividade_b)-63 as no2,
-        total from grafo'
+        total from grafo_secao'
 
-load_data <- function(banco="/home/guilherme/Repo/alvaras/data/database.db", query = division) {
+DIVISION_QUERY = 'select ano_mes, dv1.id as no1, dv2.id as no2, total
+        from grafo_divisao
+        inner JOIN divisao as dv1 on dv1.codigo = atividade_a
+        INNER join divisao as dv2 on dv2.codigo = atividade_b'
+
+GROUP_QUERY='select ano_mes, dv1.id as no1, dv2.id as no2, total
+        from grafo_grupo
+        inner JOIN grupo as dv1 on dv1.codigo = atividade_a
+        INNER join grupo as dv2 on dv2.codigo = atividade_b'
+
+CLASS_QUERY='select ano_mes, dv1.id as no1, dv2.id as no2, total
+        from grafo_classe
+        inner JOIN classe as dv1 on dv1.codigo = atividade_a
+        INNER join classe as dv2 on dv2.codigo = atividade_b'
+
+load_data <- function(banco="/home/guilherme/Repo/alvaras/data/database.db", query = SECTION_QUERY) {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
@@ -33,7 +48,7 @@ load_graph <-function(data) {
         apply(graph_data,
           1,
           function(row) c(row[[1]],row[[2]]))),
-      n = 21, directed = FALSE)
+      directed = FALSE)
     graphs[[i]] <- delete_vertices(graphs[[i]], which(degree(graphs[[i]])==0))
   }
   names(graphs) <- year_months
@@ -57,7 +72,6 @@ generate_random_graphs <- function(graphs, n=100) {
         graphs,
         function(x) sample_gnm(vcount(x), ecount(x), directed = FALSE)),
       graph_metrics))
-  #return(apply(random_graphs, c(1,2), mean))
   return(random_graphs)
 }
 
@@ -70,33 +84,36 @@ generate_randomized_sequence <- function(graphs, n=100) {
         sample_degseq(degree_seq) # modelo de configuração
       }),
       graph_metrics))
-  #return(apply(random_graphs, c(1,2), mean))
   return(random_graphs)
 }
 
-list_of_graphs <- load_graph(load_data())
-list_of_random_graphs <- generate_random_graphs(list_of_graphs)
-list_of_random_graphs2 <- generate_randomized_sequence(list_of_graphs)
+test_groups_clustres <- function (query=SECTION_QUERY) {
 
-summary_graphs <- sapply(list_of_graphs, graph_metrics)
+  list_of_graphs <- load_graph(load_data(query=query))
+  summary_graphs <- sapply(list_of_graphs, graph_metrics)
+  
+  summary_of_random_graphs <- generate_random_graphs(list_of_graphs)
+  summary_of_random_graphs2 <- generate_randomized_sequence(list_of_graphs)
 
-mean_random_graph <- apply(list_of_random_graphs, c(1,2), mean)
-#sd_random_graph <- apply(list_of_random_graphs, c(1,2), sd)
-mean_random_graph2 <- apply(list_of_random_graphs2, c(1,2), mean)
+  r1_wilcox <- sapply(c("cluster","transitivity","path","assortativity"), function(x) {
+    wilcox.test(
+      summary_graphs[x,],
+      summary_of_random_graphs[x,,] %>% as.vector(),
+      alternative = "two.sided"
+    )$p.value
+  })
+  
+  r2_wilcox <- sapply(c("cluster","transitivity","path","assortativity"), function(x) {
+    wilcox.test(
+      summary_graphs[x,],
+      summary_of_random_graphs2[x,,] %>% as.vector(),
+      alternative = "two.sided"
+    )$p.value
+  })
+  return(rbind(r1_wilcox,r2_wilcox))
+}
 
-#sd_random_graph2 <- apply(list_of_random_graphs2, c(1,2), sd)
-r1_wilcox <- sapply(c("cluster","transitivity","path","assortativity"), function(x) {
-  wilcox.test(
-    summary_graphs[x,],
-    list_of_random_graphs[x,,] %>% as.vector(),
-    alternative = "two.sided"
-  )$p.value
-})
-
-r2_wilcox <- sapply(c("cluster","transitivity","path","assortativity"), function(x) {
-  wilcox.test(
-    summary_graphs[x,],
-    list_of_random_graphs2[x,,] %>% as.vector(),
-    alternative = "two.sided"
-  )$p.value
-})
+section = test_groups_clustres()
+division = test_groups_clustres(DIVISION_QUERY)
+group = test_groups_clustres(GROUP_QUERY)
+class = test_groups_clustres(CLASS_QUERY)

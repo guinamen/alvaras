@@ -1,4 +1,4 @@
-CREATE TABLE "agrupamento_secao" (
+CREATE TABLE "agrupamento_classe" (
 	"id"	INTEGER NOT NULL,
 	"min"	INTEGER NOT NULL,
 	"max"	INTEGER NOT NULL,
