@@ -79,6 +79,12 @@ save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", ta
       paste('select * from',table_graph)
     )
   )
+  l <-as_tibble(
+    dbGetQuery(
+      mydb,
+      'select codigo from classe ORDER by codigo'
+    )
+  )
   clusters <-as_tibble(
     dbGetQuery(
       mydb,
@@ -87,8 +93,8 @@ save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", ta
   )
 
   dbDisconnect(mydb)
-  dados$atividade_a <- factor(dados$atividade_a,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
-  dados$atividade_b <- factor(dados$atividade_b,levels = c('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U'))
+  dados$atividade_a <- factor(dados$atividade_a,levels = l$codigo)
+  dados$atividade_b <- factor(dados$atividade_b,levels = l$codigo)
   dados$atividade_a <- as.numeric(dados$atividade_a)
   dados$atividade_b <- as.numeric(dados$atividade_b)
   anos = sort(unique(dados %>% pull(ano_mes)))
