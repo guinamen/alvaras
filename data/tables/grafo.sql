@@ -9,6 +9,41 @@ CREATE TABLE "grafo_secao" (
 	FOREIGN KEY("atividade_b") REFERENCES secao("codigo"),
 	PRIMARY KEY("ano_mes","atividade_a","atividade_b")
 );
+CREATE TABLE "grafo_secao_bimestre" (
+	"ano_mes"	INTEGER NOT NULL,
+	"atividade_a"	TEXT NOT NULL,
+	"atividade_b"	TEXT NOT NULL,
+	"total"	INTEGER NOT NULL,
+	CHECK (total > 0),
+	FOREIGN KEY("ano_mes") REFERENCES carga("bimestre"),
+	FOREIGN KEY("atividade_a") REFERENCES secao("codigo"),
+	FOREIGN KEY("atividade_b") REFERENCES secao("codigo"),
+	PRIMARY KEY("ano_mes","atividade_a","atividade_b")
+);
+CREATE TABLE "grafo_secao_trimestre" (
+	"ano_mes"	INTEGER NOT NULL,
+	"atividade_a"	TEXT NOT NULL,
+	"atividade_b"	TEXT NOT NULL,
+	"total"	INTEGER NOT NULL,
+	CHECK (total > 0),
+	FOREIGN KEY("ano_mes") REFERENCES carga("trimestre"),
+	FOREIGN KEY("atividade_a") REFERENCES secao("codigo"),
+	FOREIGN KEY("atividade_b") REFERENCES secao("codigo"),
+	PRIMARY KEY("ano_mes","atividade_a","atividade_b")
+);
+
+CREATE TABLE "grafo_secao_quadrimestre" (
+	"ano_mes"	INTEGER NOT NULL,
+	"atividade_a"	TEXT NOT NULL,
+	"atividade_b"	TEXT NOT NULL,
+	"total"	INTEGER NOT NULL,
+	CHECK (total > 0),
+	FOREIGN KEY("ano_mes") REFERENCES carga("quadrimestre"),
+	FOREIGN KEY("atividade_a") REFERENCES secao("codigo"),
+	FOREIGN KEY("atividade_b") REFERENCES secao("codigo"),
+	PRIMARY KEY("ano_mes","atividade_a","atividade_b")
+);
+
 CREATE TABLE "grafo_divisao" (
 	"ano_mes"	TEXT NOT NULL,
 	"atividade_a"	TEXT NOT NULL,

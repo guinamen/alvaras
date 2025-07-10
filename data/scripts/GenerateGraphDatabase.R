@@ -8,6 +8,28 @@ SECTION_QUERY = 'select ano_mes, alvara, group_concat(distinct secao) as divisoe
              INNER join alvara on alvara.codigo = atividade.alvara)
          group by ano_mes, alvara'
 
+SECTION_QUERY_2_MONTH = 'select bimestre as ano_mes, alvara, group_concat(distinct secao) as divisoes from
+          (select DISTINCT carga.bimestre ,atividade.alvara, divisao.secao from atividade
+             INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara
+			 INNER JOIN carga on carga.ano_mes = alvara.ano_mes)
+         group by ano_mes, alvara'
+
+SECTION_QUERY_3_MONTH = 'select trimestre as ano_mes, alvara, group_concat(distinct secao) as divisoes from
+          (select DISTINCT carga.trimestre ,atividade.alvara, divisao.secao from atividade
+             INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara
+			 INNER JOIN carga on carga.ano_mes = alvara.ano_mes)
+         group by ano_mes, alvara'
+
+SECTION_QUERY_4_MONTH = 'select quadrimestre as ano_mes, alvara, group_concat(distinct secao) as divisoes from
+          (select DISTINCT carga.quadrimestre ,atividade.alvara, divisao.secao from atividade
+             INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
+             INNER join alvara on alvara.codigo = atividade.alvara
+			 INNER JOIN carga on carga.ano_mes = alvara.ano_mes)
+         group by ano_mes, alvara'
+
+
 DIVISION_QUERY = 'select ano_mes, alvara, group_concat(distinct codigo) as divisoes from
           (select DISTINCT alvara.ano_mes ,atividade.alvara, divisao.codigo from atividade
              INNER JOIN divisao on substr(atividade, 1 ,2) = divisao.codigo
@@ -71,7 +93,7 @@ find_index_leq <- function(vec, x) {
   return(max(idx))
 }
 
-save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", table_group="agrupamento_classe", table_graph='grafo_classe') {
+save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", table_group="agrupamento", table_graph='grafo_secao_bimestre', table_graph_group='secao') {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dados <-as_tibble(
     dbGetQuery(
@@ -82,7 +104,7 @@ save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", ta
   l <-as_tibble(
     dbGetQuery(
       mydb,
-      'select codigo from classe ORDER by codigo'
+      paste('select codigo from',table_graph_group,'ORDER by codigo')
     )
   )
   clusters <-as_tibble(

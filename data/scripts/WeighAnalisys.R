@@ -2,7 +2,10 @@ library(DBI)
 library(tidyverse)
 library(hash)
 
-load_data <- function(banco="database.db", table="grafo_classe") {
+GAPH_TABLE="grafo_secao_bimestre"
+GRUPPING_TABLE="agrupamento"
+
+load_data <- function(banco="database.db", table=GAPH_TABLE) {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
@@ -47,7 +50,7 @@ elboow <- function(totals, max_k=15, nstart=50,iter.max = 15 ) {
   return(totals)
 }
 
-save_clusters <- function(banco="database.db", table="agrupamento_classe") {
+save_clusters <- function(banco="database.db", table=GRUPPING_TABLE) {
   dataset <- elboow(load_data()) %>% group_by(cluster) %>% summarise(min=min(total), max=max(total)) %>% arrange(min) %>% select(min,max)
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dbSendQuery(mydb, paste('INSERT INTO',table, '(min, max) VALUES (:min, :max);'), dataset)
