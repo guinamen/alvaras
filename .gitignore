@@ -20,3 +20,5 @@ data/freq_subgraph.txt
 results/freq_subgraph/results.txt
 results/freq_subgraph/log.txt
 results/freq_subgraph/support.txt
+data/time_struct.pdf
+data/assortativity.pdf

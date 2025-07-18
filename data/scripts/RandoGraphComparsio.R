@@ -141,18 +141,18 @@ realize_experiment <- function (method = "bonferroni") {
   section_3_month = test_groups_clustres(SECTION_QUERY_3_MONTH)
   section_4_month = test_groups_clustres(SECTION_QUERY_4_MONTH)
   
-  division = test_groups_clustres(DIVISION_QUERY)
-  group = test_groups_clustres(GROUP_QUERY)
-  class = test_groups_clustres(CLASS_QUERY)
+  #division = test_groups_clustres(DIVISION_QUERY)
+  #group = test_groups_clustres(GROUP_QUERY)
+  #class = test_groups_clustres(CLASS_QUERY)
   
   all_data <- bind_rows(
     mutate(section, Grouping = "1 Month"),
     mutate(section_2_month, Grouping = "2 Month"),
     mutate(section_3_month, Grouping = "3 Month"),
     mutate(section_4_month, Grouping = "4 Month"),
-    mutate(division, Grouping = "Division"),
-    mutate(group, Grouping = "Group"),
-    mutate(class, Grouping = "Class")
+    #mutate(division, Grouping = "Division"),
+    #mutate(group, Grouping = "Group"),
+    #mutate(class, Grouping = "Class")
   )
   all_data <- all_data[,c(5,1,2,3,4)]
   all_data[,c(3,4,5)] <- matrix(

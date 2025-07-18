@@ -9,7 +9,11 @@ DATA_BASE_TABLES = tables/*.sql
 GENERATE_GRAPH = ./scripts/generate_graph.R
 GENERATE_GRAPH_FILE = ./scripts/generate_graph_file.R
 GENERATE_CLUSTER = ./scripts/generate_clusters.R
+GENERATE_GRAPHICS = ./scripts/generate_graphics.R
 GRAPH_FILE = freq_subgraph.txt
+
+time_struct.pdf, assortativity.pdf: cluster
+	$(GENERATE_GRAPHICS)
 
 freq_subgraph.txt: cluster
 	 $(GENERATE_GRAPH_FILE)
@@ -38,3 +42,5 @@ clean:
 	rm -f $(DATA_SQL)
 	rm -f $(DATA_BASE)
 	rm -f $(GRAPH_FILE)
+	rm -f time_struct.pdf
+	rm -f assortativity.pdf
