@@ -2,7 +2,7 @@ library(DBI)
 library(tidyverse)
 library(hash)
 
-GAPH_TABLE="grafo_secao_bimestre"
+GAPH_TABLE="grafo_divisao"
 GRUPPING_TABLE="agrupamento"
 
 load_data <- function(banco="database.db", table=GAPH_TABLE) {

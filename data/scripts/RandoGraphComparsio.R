@@ -41,7 +41,7 @@ CLASS_QUERY='select ano_mes, dv1.id as no1, dv2.id as no2, total
         inner JOIN classe as dv1 on dv1.codigo = atividade_a
         INNER join classe as dv2 on dv2.codigo = atividade_b'
 
-load_data <- function(banco="/home/guilherme/Repo/alvaras/data/database.db", query = SECTION_QUERY) {
+load_data <- function(banco="database.db", query = SECTION_QUERY) {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dt <-as_tibble(
     dbGetQuery(
@@ -137,22 +137,22 @@ test_groups_clustres <- function (query=SECTION_QUERY) {
 
 realize_experiment <- function (method = "bonferroni") {
   section = test_groups_clustres()
-  section_2_month = test_groups_clustres(SECTION_QUERY_2_MONTH)
-  section_3_month = test_groups_clustres(SECTION_QUERY_3_MONTH)
-  section_4_month = test_groups_clustres(SECTION_QUERY_4_MONTH)
+  #section_2_month = test_groups_clustres(SECTION_QUERY_2_MONTH)
+  #section_3_month = test_groups_clustres(SECTION_QUERY_3_MONTH)
+  #section_4_month = test_groups_clustres(SECTION_QUERY_4_MONTH)
   
-  #division = test_groups_clustres(DIVISION_QUERY)
-  #group = test_groups_clustres(GROUP_QUERY)
-  #class = test_groups_clustres(CLASS_QUERY)
+  division = test_groups_clustres(DIVISION_QUERY)
+  group = test_groups_clustres(GROUP_QUERY)
+  class = test_groups_clustres(CLASS_QUERY)
   
   all_data <- bind_rows(
-    mutate(section, Grouping = "1 Month"),
-    mutate(section_2_month, Grouping = "2 Month"),
-    mutate(section_3_month, Grouping = "3 Month"),
-    mutate(section_4_month, Grouping = "4 Month"),
-    #mutate(division, Grouping = "Division"),
-    #mutate(group, Grouping = "Group"),
-    #mutate(class, Grouping = "Class")
+    mutate(section, Grouping = "Section"),
+    #mutate(section_2_month, Grouping = "2 Month"),
+    #mutate(section_3_month, Grouping = "3 Month"),
+    #mutate(section_4_month, Grouping = "4 Month"),
+    mutate(division, Grouping = "Division"),
+    mutate(group, Grouping = "Group"),
+    mutate(class, Grouping = "Class")
   )
   all_data <- all_data[,c(5,1,2,3,4)]
   all_data[,c(3,4,5)] <- matrix(
@@ -160,7 +160,7 @@ realize_experiment <- function (method = "bonferroni") {
       as.vector(
         as.matrix(
           all_data[,c(3,4,5)])), method = method),
-    nrow=7*2, ncol=3)
+    nrow=4*2, ncol=3)
   return(all_data)
 }
 x <- realize_experiment()

@@ -12,7 +12,7 @@ GENERATE_CLUSTER = ./scripts/generate_clusters.R
 GENERATE_GRAPHICS = ./scripts/generate_graphics.R
 GRAPH_FILE = freq_subgraph.txt
 
-time_struct.pdf, assortativity.pdf: cluster
+time_struct.pdf, assortativity.pdf: freq_subgraph.txt
 	$(GENERATE_GRAPHICS)
 
 freq_subgraph.txt: cluster

@@ -93,7 +93,7 @@ find_index_leq <- function(vec, x) {
   return(max(idx))
 }
 
-save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", table_group="agrupamento", table_graph='grafo_secao_bimestre', table_graph_group='secao') {
+save_graph_file <- function(banco="database.db", arquivo="freq_subgraph.txt", table_group="agrupamento", table_graph='grafo_divisao', table_graph_group='divisao') {
   mydb <- dbConnect(RSQLite::SQLite(), banco)
   dados <-as_tibble(
     dbGetQuery(
